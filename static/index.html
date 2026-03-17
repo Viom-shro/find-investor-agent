@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+    <main>
+        <header>
+            <h1>Investor Finder</h1>
+            <p class="subtitle">Find active investors matching your criteria</p>
+        </header>
+
+        <section class="search-section">
+            <div class="search-wrapper">
+                <input type="text" id="queryInput" placeholder="Example: Fintech investors in India investing $500k–$2M"
+                    autocomplete="off" />
+                <button id="searchBtn">Search</button>
+            </div>
+        </section>
+
+
+        <section class="results-section" id="resultsArea">
+            <div class="stats" id="stats">Ready to search…</div>
+
+            <div class="loading hidden" id="loading">
+                <div class="spinner"></div>
+                <p>Searching investors...</p>
+            </div>
+
+            <div id="resultsList" class="results-grid"></div>
+        </section>
+    </main>
+
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>
