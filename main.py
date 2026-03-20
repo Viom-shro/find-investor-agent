@@ -1,71 +1,52 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import RedirectResponse
-from pydantic import BaseModel
-import os
-import logging
-import traceback
-from dotenv import load_dotenv
+from __future__ import annotations
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+import argparse
+import json
+import sys
+from typing import Any
+
+from investor_agent.agent import InvestorDataAgent
 
 
-load_dotenv()
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Find investor info and save to CSV.")
+    parser.add_argument(
+        "query",
+        type=str,
+        help='Example: "Fintech investors in India investing $500k–$2M"',
+    )
+    parser.add_argument("--max-results", type=int, default=8, help="How many search results to scan.")
+    parser.add_argument("--max-pages", type=int, default=None, help="Hard cap on fetched pages.")
+    parser.add_argument("--sleep-s", type=float, default=1.0, help="Delay between page fetch/extract.")
+    parser.add_argument("--output-csv", type=str, default=None, help="Output CSV path.")
+    parser.add_argument(
+        "--provider",
+        type=str,
+        choices=["openai", "gemini"],
+        default=None,
+        help="Force LLM provider (if both keys exist).",
+    )
+    parser.add_argument("--max-page-chars", type=int, default=12000, help="Truncate page text for LLM.")
+    parser.add_argument("--print-only", action="store_true", help="Do not write CSV, only print records JSON.")
 
-from agents.investor_agent import app as agent_graph 
+    args = parser.parse_args()
 
-backend = FastAPI(
-    title="Investor Finder API",
-    description="Simple API for finding investors using LLM + search tools",
-)
+    agent = InvestorDataAgent(output_csv=args.output_csv, sleep_s=args.sleep_s)
+    records: list[dict[str, Any]] = agent.run(
+        args.query,
+        max_results=args.max_results,
+        max_pages=args.max_pages,
+        provider=args.provider,
+        user_agent_max_chars=args.max_page_chars,
+    )
+
+    if args.print_only:
+        print(json.dumps(records, ensure_ascii=False, indent=2))
+    else:
+        print(f"Saved {len(records)} records to CSV.")
+    return 0
 
 
-backend.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],           # tighten this later 
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+if __name__ == "__main__":
+    sys.exit(main())
 
-backend.mount("/static", StaticFiles(directory="static"), name="static")
-
-
-class SearchRequest(BaseModel):
-    query: str
-
-@backend.post("/api/search")
-async def search_investors(req: SearchRequest):
-    if not req.query.strip():
-        raise HTTPException(status_code=400, detail="Query cannot be empty")
-
-    try:
-        result = agent_graph.invoke({
-            "query": req.query,
-            "search_queries": [],
-            "search_results": [],
-            "final_answer": "",
-            "messages": []
-        })
-
-        import json 
-        try:
-            parsed = json.loads(result["final_answer"])
-        except Exception as e:
-            parsed = {
-                "investors": [],
-                "count": 0,
-                "message": f"Agent returned invalid JSON → {str(e)}"
-            }
-
-        return parsed
-    
-    except Exception as e:
-        logger.error("Agent error:\n%s", traceback.format_exc())
-        raise HTTPException(status_code=500, detail=f"Agent error: {str(e)}")
-
-@backend.get("/")
-async def root():
-    return RedirectResponse(url="/static/index.html")

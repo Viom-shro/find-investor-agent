@@ -1,47 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Investor Data Agent</title>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Investor Data Agent</h1>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      <label for="query">Investor query</label>
+      <textarea
+        id="query"
+        rows="3"
+        placeholder='Example: "Fintech investors in India investing $500k–$2M"'
+      ></textarea>
 
-</head>
+      <div class="row">
+        <div class="field">
+          <label for="maxResults">Max search results</label>
+          <input id="maxResults" type="number" min="1" max="20" value="8" />
+        </div>
+        <div class="field">
+          <label for="maxPages">Max pages (optional)</label>
+          <input id="maxPages" type="number" min="1" max="20" placeholder="blank" />
+        </div>
+      </div>
 
-<body>
-    <main>
-        <header>
-            <h1>Investor Finder</h1>
-            <p class="subtitle">Find active investors matching your criteria</p>
-        </header>
+      <div class="row">
+        <div class="field">
+          <label for="provider">LLM provider (optional)</label>
+          <select id="provider">
+            <option value="">Auto</option>
+            <option value="openai">OpenAI</option>
+            <option value="gemini">Gemini</option>
+          </select>
+        </div>
+      </div>
 
-        <section class="search-section">
-            <div class="search-wrapper">
-                <input type="text" id="queryInput" placeholder="Example: Fintech investors in India investing $500k–$2M"
-                    autocomplete="off" />
-                <button id="searchBtn">Search</button>
-            </div>
-        </section>
+      <button id="runBtn" class="primary">Run</button>
 
+      <div id="status" class="status" aria-live="polite"></div>
 
-        <section class="results-section" id="resultsArea">
-            <div class="stats" id="stats">Ready to search…</div>
-
-            <div class="loading hidden" id="loading">
-                <div class="spinner"></div>
-                <p>Searching investors...</p>
-            </div>
-
-            <div id="resultsList" class="results-grid"></div>
-        </section>
+      <section id="results" class="results hidden">
+        <h2>Extracted records</h2>
+        <div class="meta" id="meta"></div>
+        <table class="table" id="table">
+          <thead>
+            <tr>
+              <th>Investor</th>
+              <th>Type</th>
+              <th>Stage</th>
+              <th>Location</th>
+              <th>Industry</th>
+              <th>Source</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <a id="downloadLink" class="link hidden" href="#">Download CSV</a>
+      </section>
     </main>
 
-
-    <script src="js/main.js"></script>
-</body>
-
+    <script src="/static/app.js"></script>
+  </body>
 </html>
+
