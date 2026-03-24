@@ -46,7 +46,7 @@ python main.py "Fintech investors in India investing $500k–$2M" --print-only
 Run the API + web page:
 
 ```powershell
-uvicorn app:app --reload --host 0.0.0.0 --port 8000
+uvicorn app:app --reload --port 8000
 ```
 
 Open in browser:
