@@ -5,7 +5,7 @@ import uuid
 from typing import Any
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -26,12 +26,18 @@ def root():
     return RedirectResponse(url="/static/index.html")
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    # Browser requests this automatically; return empty response to avoid noisy 404 logs.
+    return Response(status_code=204)
+
+
 class RunRequest(BaseModel):
-    query: str = Field(..., description='Example: "Fintech investors in India investing $500k–$2M"')
+    query: str = Field(...)
     max_results: int = Field(8, ge=1, le=20)
     max_pages: int | None = Field(None, ge=1)
-    provider: str | None = Field(None, description="Force provider: openai or gemini")
-    output_mode: str = Field("csv", description="csv or json (json still returns records)")
+    provider: str | None = Field(None)
+    output_mode: str = Field("csv")
 
 
 class RunResponse(BaseModel):
