@@ -8,6 +8,7 @@ from typing import Any
 from investor_agent.agent import InvestorDataAgent
 
 
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Find investor info and save to CSV.")
     parser.add_argument(

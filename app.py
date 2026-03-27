@@ -45,6 +45,7 @@ class RunResponse(BaseModel):
     records_count: int
     records: list[dict[str, Any]] = []
     csv_url: str | None = None
+    debug: dict[str, Any] | None = None
 
 
 @app.post("/api/run", response_model=RunResponse)
@@ -56,7 +57,7 @@ def run(req: RunRequest):
 
     agent = InvestorDataAgent(output_csv=output_csv, sleep_s=1.0)
     try:
-        records = agent.run(
+        records, stats = agent.run_with_stats(
             req.query,
             max_results=req.max_results,
             max_pages=req.max_pages,
@@ -73,6 +74,7 @@ def run(req: RunRequest):
         records_count=len(records),
         records=records,
         csv_url=csv_url,
+        debug=stats,
     )
 
 

@@ -47,6 +47,21 @@ function renderRecords(records) {
   }
 }
 
+function renderDebug(debug) {
+  if (!debug) return "";
+  const parts = [
+    `provider: ${debug.provider_used ?? ""}`,
+    `serp results: ${debug.search_results_count ?? 0}`,
+    `pages considered: ${debug.pages_considered ?? 0}`,
+    `fetched ok: ${debug.pages_fetched_ok ?? 0}`,
+    `empty text: ${debug.pages_empty_text ?? 0}`,
+    `fetch failed: ${debug.pages_fetch_failed ?? 0}`,
+    `extract ok: ${debug.pages_extraction_ok ?? 0}`,
+    `extract failed: ${debug.pages_extraction_failed ?? 0}`,
+  ];
+  return parts.filter(Boolean).join(" | ");
+}
+
 runBtn.addEventListener("click", async () => {
   const query = $("query").value.trim();
   if (!query) {
@@ -81,7 +96,8 @@ runBtn.addEventListener("click", async () => {
     if (!res.ok) throw new Error(data.detail || "Request failed");
 
     renderRecords(data.records || []);
-    metaEl.textContent = `Records: ${data.records_count} (job_id: ${data.job_id})`;
+    const dbg = renderDebug(data.debug);
+    metaEl.textContent = `Records: ${data.records_count} (job_id: ${data.job_id})${dbg ? " — " + dbg : ""}`;
     resultsEl.classList.remove("hidden");
 
     if (data.csv_url) {
@@ -89,7 +105,11 @@ runBtn.addEventListener("click", async () => {
       downloadLink.classList.remove("hidden");
     }
 
-    setStatus("Done.");
+    if ((data.records_count || 0) === 0) {
+      setStatus("Done, but 0 records found. Try increasing Max search results, changing the query wording, or switching provider.", true);
+    } else {
+      setStatus("Done.");
+    }
   } catch (err) {
     setStatus(String(err?.message || err), true);
   } finally {

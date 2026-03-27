@@ -49,7 +49,7 @@ def build_extraction_chain():
                     "Web page text (may be truncated):\n"
                     "{page_text}\n\n"
                     "Extraction rules:\n"
-                    "- Only extract investors that match the user query intent (Fintech investors in India and the investment range if mentioned).\n"
+                    "- Only extract investors that match the user query intent, including sector, geography, and check-size range if mentioned in the query.\n"
                     "- If you cannot confirm investor name/type or investment size, still return the best possible fields but leave unknown fields as null.\n"
                     "- evidence_quote must be a short quote/snippet from the page text.\n"
                     "- Return empty array if nothing relevant.\n\n"
@@ -96,4 +96,3 @@ def extract_investors_from_page(
     json_str = _safe_json_from_text(raw)
     result = InvestorExtractionResult.model_validate_json(json_str)
     return [r.model_dump() for r in result.records]
-
