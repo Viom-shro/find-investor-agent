@@ -63,6 +63,7 @@ def run(req: RunRequest):
             max_pages=req.max_pages,
             provider=req.provider,
         )
+        
     except RuntimeError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:

@@ -117,3 +117,10 @@ runBtn.addEventListener("click", async () => {
   }
 });
 
+runBtn.addEventListener("click", async () => {
+  // ADD THESE LINES TEMPORARILY
+  console.log("maxResults el:", $("maxResults"));
+  console.log("maxPages el:", $("maxPages"));
+  console.log("provider el:", $("provider"));
+  console.log("query el:", $("query"));
+});
